@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Interface alternativa para permissões (OC 1.5)</name>
+	<code>tela-permissoes-alternativa</code>
+	<version>1.0</version>
+	<author>Marlon Oliveira</author>
+	<file path="admin/controller/user/user_permission.php">
+		<operation>
+			<search position="after"><![CDATA[$this->data['permissions'] = array();]]></search>
+			<add><![CDATA[$this->data['a_permissions'] = array();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[$this->data['permissions'][] = $permission;]]></search>
+			<add><![CDATA[//$data['permissions'][] = $permission;
+				$permission_dir = end($data);
+				$permission_file = basename($file, '.php');
+				if (!isset($this->data['a_permissions'][$permission_dir])) {
+					$this->data['a_permissions'][$permission_dir] = array();
+				}
+				$this->data['a_permissions'][$permission_dir][] = $permission_file;
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/view/template/user/user_group_form.tpl">
+		<operation>
+			<search position="before" offset="1"><![CDATA[<td><?php echo $entry_access; ?></td>]]></search>
+			<add><![CDATA[</table>
+				<div id="tabs" class="vtabs"><?php foreach (array_keys($a_permissions) as $dir) { ?><a href="#tab-<?php echo $dir; ?>"><?php echo $dir; ?></a><?php } ?></div>
+<?php foreach ($a_permissions as $dir => $files) { ?>
+				<div id="tab-<?php echo $dir; ?>" class="vtabs-content">
+				<table class="list">
+					<thead>
+						<tr>
+							<td class="left">&nbsp;</td>
+							<td class="center">
+								<input type="checkbox" onclick="$('td.access-<?php echo $dir; ?>').find(':checkbox').attr('checked', $(this).is(':checked'));" />
+								<?php echo $entry_access; ?>
+							</td>
+							<td class="center">
+								<input type="checkbox" onclick="$('td.modify-<?php echo $dir; ?>').find(':checkbox').attr('checked', $(this).is(':checked'));" />
+								<?php echo $entry_modify; ?>
+							</td>
+						</tr>
+					</thead>
+					<tbody>
+<?php foreach ($files as $file) { ?>
+<?php $permission = $dir . '/' . $file; ?>
+						<tr title="<?php echo $permission; ?>">
+							<td class="left"><?php echo $file; ?></td>
+							<td class="center access-<?php echo $dir; ?>">
+								<label style="display:block">
+									<?php if (in_array($permission, $access)) { ?>
+									<input type="checkbox" name="permission[access][]" value="<?php echo $permission; ?>" checked="checked" />
+									<?php } else { ?>
+									<input type="checkbox" name="permission[access][]" value="<?php echo $permission; ?>" />
+									<?php } ?>
+								</label>
+							</td>
+							<td class="center modify-<?php echo $dir; ?>">
+								<label style="display:block">
+									<?php if (in_array($permission, $modify)) { ?>
+									<input type="checkbox" name="permission[modify][]" value="<?php echo $permission; ?>" checked="checked" />
+									<?php } else { ?>
+									<input type="checkbox" name="permission[modify][]" value="<?php echo $permission; ?>" />
+									<?php } ?>
+								</label>
+							</td>
+						</tr>
+<?php } ?>
+					</tbody>
+				</table>
+				</div>
+<?php } ?>
+<script type="text/javascript"><!--
+$('#tabs a').tabs();
+//--></script>
+				<table style="display:none">
+]]></add>
+		</operation>
+	</file>
+</modification>
