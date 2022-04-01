@@ -1,3 +1,9 @@
+ # New-Permissions-Screen-for-OpenCart
+
+Improvement in the page interface to change users permissions in the Adcencart Administration.
+
+ Required VQMOD for version 1.5
+
 # Nova tela de permissões para OpenCart
 
 Melhoria na interface da página para alterar as permissões dos usuários na adminstração do OpenCart.
